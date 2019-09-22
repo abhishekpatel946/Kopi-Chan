@@ -1,14 +1,19 @@
 import logging
+import pprint
 import random
 import telegram
+from datetime import datetime
 from telegram import (KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackQueryHandler)
+from sheets_log import insert_order
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+pp = pprint.PrettyPrinter()
 
 MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED = range(4)
 
@@ -165,8 +170,15 @@ def servings_button_clicked(update, context):
     return ConversationHandler.END
 
 def log_data(context_data):
-    from pprint import pprint
-    pprint(context_data)
+    date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    name = context_data['input_name']
+    username = context_data['user']
+    order = context_data['selected_order']
+    servings = context_data['servings']
+    is_iced	= context_data['if_ice']
+    # sugar_level = context_data[]
+    pp.pprint(context_data)
+    insert_order([date, name, username, order, servings, is_iced])    
 
 def cancel(update, context):
     user = update.message.from_user
