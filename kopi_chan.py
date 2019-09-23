@@ -1,11 +1,13 @@
 import logging
 import pprint
 import random
+import time
 import telegram
 from datetime import datetime
 from telegram import (KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackQueryHandler)
 from sheets_log import insert_order
+
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -55,13 +57,13 @@ suggested_donation = {
 def start(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
     update.message.reply_text(
-        'Hi! Kopi Chan here! 😀\nReady to get caffeinated?\n\n'
+        'Hi! Kopi chan here! 😀\nReady to get caffeinated?\n\n'
         "Send /menu to see what's on the menu today!\n\n"
         'Send /order to TREAT YO SELF!\n\n'
         # 'Send /feedback to give us your valuable inputs!\n\n'
         'Send /cancel to stop talking to me 🥺\n')
 
-    return
+    return ConversationHandler.END
 
 def menu(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
@@ -72,26 +74,36 @@ def menu(update, context):
         text = "*Today's Menu\n\n*" + str_menu,
         parse_mode = telegram.ParseMode.MARKDOWN)
 
-    return
+    return ConversationHandler.END
 
 def order(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
-    update.message.reply_text('Kopi Chan is ready to take your order! 😊\n\n')
+    update.message.reply_text('I am ready to take your order! 😊\n\n')
     update.message.reply_text('What\'s your name?\n')
 
     return BUTTON_MENU
 
 def button_menu(update, context):
-    context.user_data['user'] = update.message.from_user.username
-    context.user_data['input_name'] = update.message.text  
-        
-    button_list = [[InlineKeyboardButton(s, callback_data=s)] for s in menu_items]
-    reply_markup = InlineKeyboardMarkup(button_list)
+    if update.message.text == '/cancel':
+        cancel(update, context)
+        return ConversationHandler.END
+    elif update.message.text  == '/menu':
+        menu(update, context)
+        return ConversationHandler.END
+    elif update.message.text  == '/order':
+        order(update, context)
+        return ConversationHandler.END
+    else:
+        context.user_data['user'] = update.message.from_user.username
+        context.user_data['input_name'] = update.message.text  
+            
+        button_list = [[InlineKeyboardButton(s, callback_data=s)] for s in menu_items]
+        reply_markup = InlineKeyboardMarkup(button_list)
 
-    update.message.reply_text('Hi {NAME}!\n\nWhat would you like to have for today?\n'.format(NAME = context.user_data['input_name']),
-        reply_markup=reply_markup)
-    
-    return MENU_BUTTON_CLICKED
+        update.message.reply_text('Hi {NAME}!\n\nWhat would you like to have for today?\n'.format(NAME = context.user_data['input_name']),
+            reply_markup=reply_markup)
+        
+        return MENU_BUTTON_CLICKED
 
 def menu_button_clicked(update, context):
     praises = ['Nice choice! 😍', 'Good taste~', 'Lovely 😍', 'Sounds great 🤩']
@@ -175,17 +187,25 @@ def servings_button_clicked(update, context):
         parse_mode = telegram.ParseMode.MARKDOWN)
     
     if (context.user_data['if_ice'] == 'Iced'):
-        context.bot.sendMessage(context.chat_data['chatid'], 'Your order has been successfully submitted!\n\nPlease get a cup filled with ice and proceed to one of our lovely baristas!\n')
+        context.bot.sendMessage(
+            chat_id=context.chat_data['chatid'], 
+            text = 'Your order has been successfully submitted!\n\n✳*Please get a cup filled with ice from DH and proceed to one of our lovely baristas!*\n',
+            parse_mode = telegram.ParseMode.MARKDOWN)
     elif (context.user_data['if_ice'] == 'No ice'):
-        context.bot.sendMessage(context.chat_data['chatid'], 'Your order has been successfully submitted!\n\nPlease get an empty cup and proceed to one of our lovely baristas!\n')
+        context.bot.sendMessage(
+            chat_id = context.chat_data['chatid'], 
+            text = 'Your order has been successfully submitted!\n\n✳*Please get an empty cup and proceed to one of our lovely baristas!*\n',
+            parse_mode = telegram.ParseMode.MARKDOWN)
+
+    time.sleep(1)
+    context.user_data['recommended_dontation'] = suggested_donation[context.user_data['selected_order']] * context.user_data['servings']
 
     context.bot.sendMessage(
         chat_id = context.chat_data['chatid'], 
-        text = 'We accept PayLah donations at http://gg.gg/donateUSCaff!\n\n*The recommended donation amount for your order is: ${0:.2f}*'.format(
-            suggested_donation[context.user_data['selected_order']] * context.user_data['servings']),
+        text = 'We accept PayLah donations at http://gg.gg/donateUSCaff!\n\n*The recommended donation amount for your order is: ${0:.2f}* \n\nThis recommended donation amount will help us just nice cover our costs!'.format(context.user_data['recommended_dontation']),
         parse_mode = telegram.ParseMode.MARKDOWN)
 
-    context.bot.sendMessage(context.chat_data['chatid'], 
+    context.bot.sendMessage(context.chat_data['chatid'],
         'Thank you and enjoy your {ORDER}! ❤ Hope to see you again {NAME}! '.format(ORDER = context.user_data['selected_order'], NAME = context.user_data['input_name']))
 
     log_data(context.user_data)
@@ -199,9 +219,10 @@ def log_data(context_data):
     order = context_data['selected_order']
     servings = context_data['servings']
     is_iced	= context_data['if_ice']
-    # sugar_level = context_data[]
+    donation = context_data['recommended_dontation']
+    sugar_level = 'N.A.'
     pp.pprint(context_data)
-    insert_order([date, name, username, order, servings, is_iced])    
+    insert_order([date, name, username, order, servings, is_iced, sugar_level, donation])    
 
 def cancel(update, context):
     user = update.message.from_user
@@ -237,7 +258,9 @@ def main():
             SERVINGS_BUTTON_CLICKED: [CallbackQueryHandler(servings_button_clicked)]
         },
 
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[CommandHandler('cancel', cancel)],
+
+        allow_reentry = True
     )
 
 
