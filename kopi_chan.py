@@ -34,8 +34,8 @@ menu_items = [
         'French Press Coffee',
         'Mocha',
         'Thai Milk Tea', 
-        'Macha Latte',
-        'Brown Sugar Milk Tea'
+        'Matcha Latte'
+        # 'Brown Sugar Milk Tea'
         ]
 
 suggested_donation = {
@@ -46,7 +46,7 @@ suggested_donation = {
         'Cold-brew Tea': 0.90,
         'Hot Tea': 0.90,
         'Thai Milk Tea': 1.10, 
-        'Macha Latte': 1.80,
+        'Matcha Latte': 1.80,
         'Brown Sugar Milk Tea': 1.80
         }
 
@@ -55,10 +55,11 @@ suggested_donation = {
 def start(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
     update.message.reply_text(
-        'Hi! Kopi Chan here! Ready to get caffeinated?\n\n'
+        'Hi! Kopi Chan here! 😀\nReady to get caffeinated?\n\n'
+        "Send /menu to see what's on the menu today!\n\n"
         'Send /order to TREAT YO SELF!\n\n'
-        'Send /feedback to give us your valuable inputs!\n\n'
-        'Send /cancel to stop talking to me :( \n')
+        # 'Send /feedback to give us your valuable inputs!\n\n'
+        'Send /cancel to stop talking to me 🥺\n')
 
     return
 
@@ -75,7 +76,7 @@ def menu(update, context):
 
 def order(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
-    update.message.reply_text('Kopi Chan is ready to take your order! :3\n\n')
+    update.message.reply_text('Kopi Chan is ready to take your order! 😊\n\n')
     update.message.reply_text('What\'s your name?\n')
 
     return BUTTON_MENU
@@ -93,7 +94,7 @@ def button_menu(update, context):
     return MENU_BUTTON_CLICKED
 
 def menu_button_clicked(update, context):
-    praises = ['Nice choice :)', 'Good taste :)', 'Good choice!', 'Sounds great!']
+    praises = ['Nice choice! 😍', 'Good taste~', 'Lovely 😍', 'Sounds great 🤩']
     context.user_data['selected_order'] = update.callback_query.data
     update.callback_query.answer()
     update.callback_query.edit_message_text(text = "{ORDER}! {PRAISE}".format(
@@ -118,7 +119,7 @@ def customize_ice(update, context):
 def ice_button_clicked(update, context):
     context.user_data['if_ice'] = update.callback_query.data
     update.callback_query.answer()
-    update.callback_query.edit_message_text(text = "{}! Nice.".format(context.user_data['if_ice']))
+    update.callback_query.edit_message_text(text = "{}! Nice 👌".format(context.user_data['if_ice']))
     servings(update, context)
     return SERVINGS_BUTTON_CLICKED
 
@@ -180,12 +181,12 @@ def servings_button_clicked(update, context):
 
     context.bot.sendMessage(
         chat_id = context.chat_data['chatid'], 
-        text = 'We accept PayLah donations at http://gg.gg/donateUSCaff !\n\n*The recommended donation amount for your order is: ${0:.2f}*'.format(
+        text = 'We accept PayLah donations at http://gg.gg/donateUSCaff!\n\n*The recommended donation amount for your order is: ${0:.2f}*'.format(
             suggested_donation[context.user_data['selected_order']] * context.user_data['servings']),
         parse_mode = telegram.ParseMode.MARKDOWN)
 
     context.bot.sendMessage(context.chat_data['chatid'], 
-        'Thank you and enjoy your {ORDER}! Hope to see you again {NAME}!'.format(ORDER = context.user_data['selected_order'], NAME = context.user_data['input_name']))
+        'Thank you and enjoy your {ORDER}! ❤ Hope to see you again {NAME}! '.format(ORDER = context.user_data['selected_order'], NAME = context.user_data['input_name']))
 
     log_data(context.user_data)
 
