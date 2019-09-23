@@ -15,12 +15,33 @@ logger = logging.getLogger(__name__)
 
 pp = pprint.PrettyPrinter()
 
-MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED = range(4)
+BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED = range(4)
 
 token = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
 
+# menu_items = [
+#         'Pour-over Coffee', 
+#         'French Press Coffee',
+#         'Cold-brew Coffee',
+#         'Cold-brew Tea',
+#         'Hot Tea',
+#         'Thai Milk Tea', 
+#         'Macha Latte',
+#         'Brown Sugar Milk Tea'
+#         ]
+
+menu_items = [
+        'French Press Coffee',
+        'Mocha',
+        'Thai Milk Tea', 
+        'Macha Latte',
+        'Brown Sugar Milk Tea'
+        ]
+
 suggested_donation = {
         'Pour-over Coffee': 1.50, 
+        'French Press Coffee': 1.20,
+        'Mocha': 1.50,
         'Cold-brew Coffee': 1.50,
         'Cold-brew Tea': 0.90,
         'Hot Tea': 0.90,
@@ -32,7 +53,7 @@ suggested_donation = {
 # print(suggested_donation['Pour-over Coffee'])
 
 def start(update, context):
-
+    context.chat_data['chatid'] = update.effective_chat.id
     update.message.reply_text(
         'Hi! Kopi Chan here! Ready to get caffeinated?\n\n'
         'Send /order to TREAT YO SELF!\n\n'
@@ -41,26 +62,27 @@ def start(update, context):
 
     return
 
+def menu(update, context):
+    context.chat_data['chatid'] = update.effective_chat.id
+    str_menu = "\n".join(menu_items)
+
+    context.bot.sendMessage(
+        chat_id = context.chat_data['chatid'], 
+        text = "*Today's Menu\n\n*" + str_menu,
+        parse_mode = telegram.ParseMode.MARKDOWN)
+
+    return
+
 def order(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
     update.message.reply_text('Kopi Chan is ready to take your order! :3\n\n')
     update.message.reply_text('What\'s your name?\n')
 
-    return MENU
+    return BUTTON_MENU
 
-def menu(update, context):
+def button_menu(update, context):
     context.user_data['user'] = update.message.from_user.username
     context.user_data['input_name'] = update.message.text  
-
-    menu_items = [
-        'Pour-over Coffee', 
-        'Cold-brew Coffee',
-        'Cold-brew Tea',
-        'Hot Tea',
-        'Thai Milk Tea', 
-        'Macha Latte',
-        'Brown Sugar Milk Tea'
-        ]
         
     button_list = [[InlineKeyboardButton(s, callback_data=s)] for s in menu_items]
     reply_markup = InlineKeyboardMarkup(button_list)
@@ -208,7 +230,7 @@ def main():
         entry_points=[CommandHandler('order', order)],
 
         states={
-            MENU: [MessageHandler(Filters.all, menu)],
+            BUTTON_MENU: [MessageHandler(Filters.all, button_menu)],
             MENU_BUTTON_CLICKED: [CallbackQueryHandler(menu_button_clicked)],
             ICE_BUTTON_CLICKED: [CallbackQueryHandler(ice_button_clicked)],
             SERVINGS_BUTTON_CLICKED: [CallbackQueryHandler(servings_button_clicked)]
@@ -219,6 +241,7 @@ def main():
 
 
     dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('menu', menu))
     dp.add_handler(conv_handler)
 
     # log all errors
