@@ -60,7 +60,7 @@ def start(update, context):
         'Hi! Kopi chan here! 😀\nReady to get caffeinated?\n\n'
         "Send /menu to see what's on the menu today!\n\n"
         'Send /order to TREAT YO SELF!\n\n'
-        # 'Send /feedback to give us your valuable inputs!\n\n'
+        'Send /feedback to give us your valuable inputs!\n\n'
         'Send /cancel to stop talking to me 🥺\n')
 
     return ConversationHandler.END
@@ -240,7 +240,7 @@ def log_order_data(context_data):
 
 def feedback(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
-    update.message.reply_text('Please send me your feedback!\n\nIt could be on any area of improvment on your experience with USCaffeinated, wait time, or any recommendation!')
+    update.message.reply_text('Please send me your feedback!\n\nIt could be on any area of improvment on your experience with USCaffeinated or any recommendation!')
 
     return LOG_FEEDBACK
 
@@ -300,6 +300,7 @@ def main():
 
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('menu', menu))
+    dp.add_handler(CommandHandler('cancel', cancel))
     dp.add_handler(conv_handler)
 
     # log all errors
