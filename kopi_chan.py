@@ -6,7 +6,7 @@ import telegram
 from datetime import datetime
 from telegram import (KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackQueryHandler)
-from sheets_log import insert_order
+from sheets_log import (insert_order, insert_feedback)
 
 
 # Enable logging
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 pp = pprint.PrettyPrinter()
 
-BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED = range(4)
+BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED, LOG_FEEDBACK = range(5)
 
 token = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
 
@@ -178,6 +178,13 @@ def servings(update, context):
 def servings_button_clicked(update, context):
     context.user_data['servings'] = int(update.callback_query.data)
     update.callback_query.answer()
+
+    complete_order(update, context)
+
+    return ConversationHandler.END
+
+def complete_order(update, context):
+    # Show order summary
     update.callback_query.edit_message_text(
         text = "Let's see what we have here...\n\n*x{SERVINGS} {ORDER}, {ICE}, for {NAME}*!".format(
             SERVINGS = context.user_data['servings'] , 
@@ -186,6 +193,7 @@ def servings_button_clicked(update, context):
             NAME = context.user_data['input_name']),
         parse_mode = telegram.ParseMode.MARKDOWN)
     
+    # Preparation instructions
     if (context.user_data['if_ice'] == 'Iced'):
         context.bot.sendMessage(
             chat_id=context.chat_data['chatid'], 
@@ -197,22 +205,26 @@ def servings_button_clicked(update, context):
             text = 'Your order has been successfully submitted!\n\n✳*Please get an empty cup and proceed to one of our lovely baristas!*\n',
             parse_mode = telegram.ParseMode.MARKDOWN)
 
-    time.sleep(1)
+    time.sleep(1.5)
+
+    # Recommend donations amount
     context.user_data['recommended_dontation'] = suggested_donation[context.user_data['selected_order']] * context.user_data['servings']
 
     context.bot.sendMessage(
         chat_id = context.chat_data['chatid'], 
-        text = 'We accept PayLah donations at http://gg.gg/donateUSCaff!\n\n*The recommended donation amount for your order is: ${0:.2f}* \n\nThis recommended donation amount will help us just nice cover our costs!'.format(context.user_data['recommended_dontation']),
+        text = 'We accept PayLah donations at http://gg.gg/donateUSCaff\n\n*The recommended donation amount for your order is: ${0:.2f}* \n\nThis recommended donation amount will help us cover our costs!'.format(context.user_data['recommended_dontation']),
         parse_mode = telegram.ParseMode.MARKDOWN)
 
     context.bot.sendMessage(context.chat_data['chatid'],
         'Thank you and enjoy your {ORDER}! ❤ Hope to see you again {NAME}! '.format(ORDER = context.user_data['selected_order'], NAME = context.user_data['input_name']))
-
-    log_data(context.user_data)
+    
+    # log order data to Google sheet
+    log_order_data(context.user_data)
 
     return ConversationHandler.END
 
-def log_data(context_data):
+
+def log_order_data(context_data):
     date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     name = context_data['input_name']
     username = context_data['user']
@@ -220,9 +232,27 @@ def log_data(context_data):
     servings = context_data['servings']
     is_iced	= context_data['if_ice']
     donation = context_data['recommended_dontation']
-    sugar_level = 'N.A.'
+    sugar_level = '-'
     pp.pprint(context_data)
-    insert_order([date, name, username, order, servings, is_iced, sugar_level, donation])    
+    insert_order([date, name, username, order, servings, is_iced, sugar_level, donation])
+
+    return
+
+def feedback(update, context):
+    context.chat_data['chatid'] = update.effective_chat.id
+    update.message.reply_text('Please send me your feedback!\n\nIt could be on any area of improvment on your experience with USCaffeinated, wait time, or any recommendation!')
+
+    return LOG_FEEDBACK
+
+def log_feedback(update, context):
+    date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    username = update.message.from_user.username
+    feedback_text = update.message.text
+
+    insert_feedback([date, username, feedback_text])
+
+    update.message.reply_text('Thank you for your feedback! Your input means a lot to us!')
+    return ConversationHandler.END
 
 def cancel(update, context):
     user = update.message.from_user
@@ -249,13 +279,17 @@ def main():
 
     # Add conversation handler with the states
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('order', order)],
+        entry_points=[
+            CommandHandler('order', order),
+            CommandHandler('feedback', feedback)
+            ],
 
         states={
             BUTTON_MENU: [MessageHandler(Filters.all, button_menu)],
             MENU_BUTTON_CLICKED: [CallbackQueryHandler(menu_button_clicked)],
             ICE_BUTTON_CLICKED: [CallbackQueryHandler(ice_button_clicked)],
-            SERVINGS_BUTTON_CLICKED: [CallbackQueryHandler(servings_button_clicked)]
+            SERVINGS_BUTTON_CLICKED: [CallbackQueryHandler(servings_button_clicked)],
+            LOG_FEEDBACK: [MessageHandler(Filters.text, log_feedback)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)],
