@@ -33,23 +33,25 @@ token = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
 #         ]
 
 menu_items = [
-        'French Press Coffee',
+        'Black Coffee',
         'Mocha',
-        'Thai Milk Tea', 
-        'Matcha Latte'
-        # 'Brown Sugar Milk Tea'
+        # 'Thai Milk Tea', 
+        'Matcha Latte',
+        'Brown Sugar Milk Tea',
+        "Pu'er Tea"
         ]
 
 suggested_donation = {
-        'Pour-over Coffee': 1.50, 
-        'French Press Coffee': 1.20,
+        'Pour-over Coffee': 1.70, 
+        'Black Coffee': 1.00,
         'Mocha': 1.50,
         'Cold-brew Coffee': 1.50,
         'Cold-brew Tea': 0.90,
         'Hot Tea': 0.90,
-        'Thai Milk Tea': 1.10, 
-        'Matcha Latte': 1.80,
-        'Brown Sugar Milk Tea': 1.80
+        'Thai Milk Tea': 1.00, 
+        'Matcha Latte': 1.90,
+        'Brown Sugar Milk Tea': 1.80,
+        "Pu'er Tea": 0.50
         }
 
 # print(suggested_donation['Pour-over Coffee'])
@@ -266,7 +268,6 @@ def cancel(update, context):
 def error(update, context):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
-
 
 def main():
     # Create the Updater and pass it your bot's token.
