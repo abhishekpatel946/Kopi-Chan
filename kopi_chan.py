@@ -1,4 +1,5 @@
 import logging
+import os
 import pprint
 import random
 import time
@@ -19,37 +20,34 @@ pp = pprint.PrettyPrinter()
 
 BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED, LOG_FEEDBACK = range(5)
 
-token = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
-
-# menu_items = [
-#         'Pour-over Coffee', 
-#         'French Press Coffee',
-#         'Cold-brew Coffee',
-#         'Cold-brew Tea',
-#         'Hot Tea',
-#         'Thai Milk Tea', 
-#         'Macha Latte',
-#         'Brown Sugar Milk Tea'
-#         ]
+TOKEN = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
+APP_NAME = "kopi-chan"
+# Port is given by Heroku
+PORT = os.environ.get('PORT')
 
 menu_items = [
-        'French Press Coffee',
-        'Mocha',
+        'Pour-over Coffee', 
+        'Black Coffee',
+        'Mocha',        
+        'Cold-brew Coffee',
+        'Cold-brew Tea',
+        'Hot Tea',
         'Thai Milk Tea', 
-        'Matcha Latte'
-        # 'Brown Sugar Milk Tea'
+        'Macha Latte',
+        'Brown Sugar Milk Tea'
         ]
 
 suggested_donation = {
-        'Pour-over Coffee': 1.50, 
-        'French Press Coffee': 1.20,
+        'Pour-over Coffee': 1.70, 
+        'Black Coffee': 1.00,
         'Mocha': 1.50,
         'Cold-brew Coffee': 1.50,
         'Cold-brew Tea': 0.90,
         'Hot Tea': 0.90,
-        'Thai Milk Tea': 1.10, 
-        'Matcha Latte': 1.80,
-        'Brown Sugar Milk Tea': 1.80
+        'Thai Milk Tea': 1.00, 
+        'Matcha Latte': 1.90,
+        'Brown Sugar Milk Tea': 1.80,
+        "Pu'er Tea": 0.50
         }
 
 # print(suggested_donation['Pour-over Coffee'])
@@ -267,12 +265,11 @@ def error(update, context):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
-
 def main():
-    # Create the Updater and pass it your bot's token.
+    # Create the Updater and pass it your bot's TOKEN.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater(token, use_context=True)
+    updater = Updater(TOKEN, use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -306,14 +303,19 @@ def main():
     # log all errors
     dp.add_error_handler(error)
 
-    # Start the Bot
-    updater.start_polling()
+    # # Start the Bot
+    # updater.start_polling()
+
+    # Start the webhook
+    updater.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=TOKEN)
+    updater.bot.setWebhook("https://{}.herokuapp.com/{}".format(APP_NAME, TOKEN))
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
-
 
 if __name__ == '__main__':
     main()
