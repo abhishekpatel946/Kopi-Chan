@@ -1,0 +1,3 @@
+python-telegram-bot
+gspread
+oauth2client
