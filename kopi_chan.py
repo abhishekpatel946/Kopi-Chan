@@ -33,7 +33,7 @@ menu_items = [
         'Cold-brew Tea',
         'Hot Tea',
         'Thai Milk Tea', 
-        'Macha Latte',
+        'Matcha Latte',
         'Brown Sugar Milk Tea'
         ]
 
@@ -43,11 +43,10 @@ suggested_donation = {
         'Mocha': 1.50,
         'Cold-brew Coffee': 1.50,
         'Cold-brew Tea': 0.90,
-        'Hot Tea': 0.90,
+        'Hot Tea': 0.50,
         'Thai Milk Tea': 1.00, 
         'Matcha Latte': 1.90,
         'Brown Sugar Milk Tea': 1.80,
-        "Pu'er Tea": 0.50
         }
 
 # print(suggested_donation['Pour-over Coffee'])
