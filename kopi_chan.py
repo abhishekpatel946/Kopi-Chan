@@ -19,26 +19,18 @@ pp = pprint.PrettyPrinter()
 
 BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED, LOG_FEEDBACK = range(5)
 
-token = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
-
-# menu_items = [
-#         'Pour-over Coffee', 
-#         'French Press Coffee',
-#         'Cold-brew Coffee',
-#         'Cold-brew Tea',
-#         'Hot Tea',
-#         'Thai Milk Tea', 
-#         'Macha Latte',
-#         'Brown Sugar Milk Tea'
-#         ]
+TOKEN = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
 
 menu_items = [
+        'Pour-over Coffee', 
         'Black Coffee',
-        'Mocha',
-        # 'Thai Milk Tea', 
+        'Mocha',        
+        'Cold-brew Coffee',
+        'Cold-brew Tea',
+        'Hot Tea',
+        'Thai Milk Tea', 
         'Matcha Latte',
-        'Brown Sugar Milk Tea',
-        "Pu'er Tea"
+        'Brown Sugar Milk Tea'
         ]
 
 suggested_donation = {
@@ -47,11 +39,10 @@ suggested_donation = {
         'Mocha': 1.50,
         'Cold-brew Coffee': 1.50,
         'Cold-brew Tea': 0.90,
-        'Hot Tea': 0.90,
+        'Hot Tea': 0.50,
         'Thai Milk Tea': 1.00, 
         'Matcha Latte': 1.90,
         'Brown Sugar Milk Tea': 1.80,
-        "Pu'er Tea": 0.50
         }
 
 # print(suggested_donation['Pour-over Coffee'])
@@ -270,10 +261,10 @@ def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 def main():
-    # Create the Updater and pass it your bot's token.
+    # Create the Updater and pass it your bot's TOKEN.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater(token, use_context=True)
+    updater = Updater(TOKEN, use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
