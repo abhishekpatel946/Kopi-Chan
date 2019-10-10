@@ -2,6 +2,7 @@ import logging
 import pprint
 import random
 import time
+import pytz
 from datetime import datetime
 
 import telegram
@@ -237,7 +238,7 @@ def complete_order(update, context):
     context.bot.sendMessage(context.chat_data['chatid'],
                             'Thank you and enjoy your {ORDER}! ❤ Hope to see you again {NAME}! '.format(ORDER=context.user_data['selected_order'], NAME=context.user_data['input_name']))
 
-    # log order data to Google sheet
+    # log order data
     log_order_data(context.user_data)
 
     return ConversationHandler.END
@@ -246,7 +247,7 @@ def complete_order(update, context):
 def log_order_data(context_data):
 
     order_data = {
-        "datetime": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "datetime": datetime.now(pytz.timezone('Asia/Singapore')).strftime("%d/%m/%Y %H:%M:%S"),
         "name": context_data['input_name'],
         "username": context_data['user'],
         "order": context_data['selected_order'],
@@ -256,17 +257,17 @@ def log_order_data(context_data):
         "donation": context_data['recommended_dontation']
     }
 
-    # Google sheet
-    insert_order([
-        order_data["datetime"],
-        order_data["name"],
-        order_data["username"],
-        order_data["order"],
-        order_data["servings"],
-        order_data["is_iced"],
-        order_data["sugar_level"],
-        order_data["donation"]
-    ])
+    # # Google sheet
+    # insert_order([
+    #     order_data["datetime"],
+    #     order_data["name"],
+    #     order_data["username"],
+    #     order_data["order"],
+    #     order_data["servings"],
+    #     order_data["is_iced"],
+    #     order_data["sugar_level"],
+    #     order_data["donation"]
+    # ])
 
     # Firebase
     pushData(order_data, "orders")
@@ -285,16 +286,16 @@ def feedback(update, context):
 
 
 def log_feedback(update, context):
-    date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    date = datetime.now(pytz.timezone('Asia/Singapore')).strftime("%d/%m/%Y %H:%M:%S")
     username = update.message.from_user.username
     feedback_text = update.message.text
 
-    # Google sheet
-    insert_feedback([
-        date,
-        username,
-        feedback_text
-    ])
+    # # Google sheet
+    # insert_feedback([
+    #     date,
+    #     username,
+    #     feedback_text
+    # ])
 
     # Firebase
     feedback_data = {
