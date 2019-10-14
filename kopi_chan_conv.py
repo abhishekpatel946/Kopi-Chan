@@ -11,7 +11,7 @@ from telegram import (KeyboardButton, InlineKeyboardButton,
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, ConversationHandler, CallbackQueryHandler)
 from sheets_log import (insert_order, insert_feedback)
-from firebase import *
+from firebase import (pushData, menu_items, suggested_donation)
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -21,42 +21,8 @@ logger = logging.getLogger(__name__)
 
 pp = pprint.PrettyPrinter()
 
-all_items = [
-    'Pour-over Coffee',
-    'Black Coffee',
-    'Mocha',
-    'Cold-brew Coffee',
-    'Cold-brew Tea',
-    'Hot Tea',
-    'Thai Milk Tea',
-    'Matcha Latte',
-    'Brown Sugar Milk Tea'
-]
-
-menu_items = [
-    'Pour-over Coffee',
-    'Cold-brew Tea',
-    'Hot Tea',
-    'Matcha Latte',
-    'Thai Milk Tea'
-]
-
-suggested_donation = {
-    'Pour-over Coffee': 1.70,
-    'Black Coffee': 1.00,
-    'Mocha': 1.50,
-    'Cold-brew Coffee': 1.50,
-    'Cold-brew Tea': 0.60,
-    'Hot Tea': 0.50,
-    'Thai Milk Tea': 1.00,
-    'Matcha Latte': 1.50,
-    'Brown Sugar Milk Tea': 1.80,
-}
-
-
 # Initialize converstation handler states
-BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED, LOG_FEEDBACK = range(
-    5)
+BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED, LOG_FEEDBACK = range(5)
 
 
 def start(update, context):
@@ -257,18 +223,6 @@ def log_order_data(context_data):
         "donation": context_data['recommended_dontation']
     }
 
-    # # Google sheet
-    # insert_order([
-    #     order_data["datetime"],
-    #     order_data["name"],
-    #     order_data["username"],
-    #     order_data["order"],
-    #     order_data["servings"],
-    #     order_data["is_iced"],
-    #     order_data["sugar_level"],
-    #     order_data["donation"]
-    # ])
-
     # Firebase
     pushData(order_data, "orders")
 
@@ -286,16 +240,10 @@ def feedback(update, context):
 
 
 def log_feedback(update, context):
-    date = datetime.now(pytz.timezone('Asia/Singapore')).strftime("%d/%m/%Y %H:%M:%S")
+    date = datetime.now(pytz.timezone('Asia/Singapore')
+                        ).strftime("%d/%m/%Y %H:%M:%S")
     username = update.message.from_user.username
     feedback_text = update.message.text
-
-    # # Google sheet
-    # insert_feedback([
-    #     date,
-    #     username,
-    #     feedback_text
-    # ])
 
     # Firebase
     feedback_data = {
