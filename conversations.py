@@ -10,7 +10,6 @@ from telegram import (KeyboardButton, InlineKeyboardButton,
                       InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, ConversationHandler, CallbackQueryHandler)
-from sheets_log import (insert_order, insert_feedback)
 from firebase import (pushData, menu_items, suggested_donation)
 
 # Enable logging
