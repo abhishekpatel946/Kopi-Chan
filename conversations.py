@@ -219,7 +219,8 @@ def log_order_data(context_data):
         "servings": context_data['servings'],
         "is_iced": context_data['if_ice'],
         "sugar_level": '-',
-        "donation": context_data['recommended_dontation']
+        "donation": context_data['recommended_dontation'],
+        "served": False
     }
 
     # Firebase
