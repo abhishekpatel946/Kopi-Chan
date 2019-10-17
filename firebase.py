@@ -20,33 +20,62 @@ user = auth.sign_in_with_custom_token(token)
 # Get a reference to the database service
 db = firebase.database()
 
-today_menu = {
-    0: 'Pour-over Coffee',
-    1: 'Cold-brew Tea',
-    2: 'Hot Tea',
-    3: 'Matcha Latte',
+menu = {
+    'Pour-over Coffee': {
+        'name': 'Pour-over Coffee',
+        'serving': True,
+        'recommended_dontation': 1.70
+    },
+    'French Press Coffee - Black': {
+        'name': 'French Press Coffee - Black',
+        'serving': False,
+        'recommended_dontation': 1.00
+    },
+    'French Press Coffee - Mocha': {
+        'name': 'French Press Coffee - Mocha',
+        'serving': False,
+        'recommended_dontation': 1.50
+    },
+    'Cold-brew Coffee': {
+        'name': 'Cold-brew Coffee',
+        'serving': False,
+        'recommended_dontation': 1.00
+    },
+    'Cold-brew Tea': {
+        'name': 'Cold-brew Tea',
+        'serving': True,
+        'recommended_dontation': 0.60
+    },
+    'Hot Tea': {
+        'name': 'Hot Tea',
+        'serving': True,
+        'recommended_dontation': 0.50
+    },
+    'Thai Milk Tea': {
+        'name': 'Thai Milk Tea',
+        'serving': False,
+        'recommended_dontation': 1.00
+    },
+    'Matcha Latte': {
+        'name': 'Matcha Latte',
+        'serving': True,
+        'recommended_dontation': 1.50
+    },
+    'Brown Sugar Milk Tea': {
+        'name': 'Brown Sugar Milk Tea',
+        'serving': False,
+        'recommended_dontation': 1.50
+    },
+    'Vietnamese Coffee': {
+        'name': 'Vietnamese Coffee',
+        'serving': False,
+        'recommended_dontation': 1.50
+    }
 }
 
-suggested_donations = {
-    'Pour-over Coffee': 1.70,
-    'Black Coffee': 1.00,
-    'Mocha': 1.50,
-    'Cold-brew Coffee': 1.50,
-    'Cold-brew Tea': 0.60,
-    'Hot Tea': 0.50,
-    'Thai Milk Tea': 1.00,
-    'Matcha Latte': 1.50,
-    'Brown Sugar Milk Tea': 1.80,
-}
-
-def updateMenu(suggested_donations, today_menu):
-    db.child("menu").child("suggested_donations").update(suggested_donations)
-    db.child("menu").child("today_menu").update(today_menu)
 
 def pushData(data, dbName):
     results = db.child(dbName).push(data)
 
-updateMenu(suggested_donations, today_menu)
+# db.child("menu").update(menu)
 
-menu_items = db.child("menu").child("today_menu").get().val()
-suggested_donation = db.child("menu").child("suggested_donations").get().val()

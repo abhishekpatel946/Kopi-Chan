@@ -10,7 +10,7 @@ from telegram import (KeyboardButton, InlineKeyboardButton,
                       InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, ConversationHandler, CallbackQueryHandler)
-from firebase import (pushData, menu_items, suggested_donation)
+from firebase import (pushData, menu)
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -23,6 +23,7 @@ pp = pprint.PrettyPrinter()
 # Initialize converstation handler states
 BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED, LOG_FEEDBACK = range(5)
 
+serving_menu_names = [key for (key, value) in menu.items() if value['serving']]
 
 def start(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
@@ -36,9 +37,9 @@ def start(update, context):
     return ConversationHandler.END
 
 
-def menu(update, context):
+def today_menu(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
-    str_menu = "\n".join(menu_items)
+    str_menu = "\n".join(serving_menu_names)
 
     context.bot.sendMessage(
         chat_id=context.chat_data['chatid'],
@@ -61,7 +62,7 @@ def button_menu(update, context):
         cancel(update, context)
         return ConversationHandler.END
     elif update.message.text == '/menu':
-        menu(update, context)
+        today_menu(update, context)
         return ConversationHandler.END
     elif update.message.text == '/order':
         order(update, context)
@@ -71,7 +72,7 @@ def button_menu(update, context):
         context.user_data['input_name'] = update.message.text
 
         button_list = [[InlineKeyboardButton(
-            s, callback_data=s)] for s in menu_items]
+            s, callback_data=s)] for s in serving_menu_names]
         reply_markup = InlineKeyboardMarkup(button_list)
 
         update.message.reply_text('Hi {NAME}!\n\nWhat would you like to have for today?\n'.format(NAME=context.user_data['input_name']),
@@ -191,7 +192,7 @@ def complete_order(update, context):
     time.sleep(1.5)
 
     # Recommend donations amount
-    context.user_data['recommended_dontation'] = suggested_donation[context.user_data['selected_order']] * context.user_data['servings']
+    context.user_data['recommended_dontation'] = menu[context.user_data['selected_order']]['recommended_dontation'] * context.user_data['servings']
 
     context.bot.sendMessage(
         chat_id=context.chat_data['chatid'],
