@@ -77,5 +77,3 @@ menu = {
 def pushData(data, dbName):
     results = db.child(dbName).push(data)
 
-# db.child("menu").update(menu)
-

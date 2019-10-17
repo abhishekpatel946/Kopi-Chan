@@ -10,7 +10,7 @@ from telegram import (KeyboardButton, InlineKeyboardButton,
                       InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, ConversationHandler, CallbackQueryHandler)
-from firebase import (pushData, menu)
+from firebase import (pushData)
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -22,8 +22,6 @@ pp = pprint.PrettyPrinter()
 
 # Initialize converstation handler states
 BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED, LOG_FEEDBACK = range(5)
-
-serving_menu_names = [key for (key, value) in menu.items() if value['serving']]
 
 def start(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
@@ -39,7 +37,7 @@ def start(update, context):
 
 def today_menu(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
-    str_menu = "\n".join(serving_menu_names)
+    str_menu = "\n".join([key for (key, value) in db.child("menu").get().val().items() if value['serving']])
 
     context.bot.sendMessage(
         chat_id=context.chat_data['chatid'],
@@ -72,7 +70,7 @@ def button_menu(update, context):
         context.user_data['input_name'] = update.message.text
 
         button_list = [[InlineKeyboardButton(
-            s, callback_data=s)] for s in serving_menu_names]
+            s, callback_data=s)] for s in [key for (key, value) in db.child("menu").get().val().items() if value['serving']]]
         reply_markup = InlineKeyboardMarkup(button_list)
 
         update.message.reply_text('Hi {NAME}!\n\nWhat would you like to have for today?\n'.format(NAME=context.user_data['input_name']),
