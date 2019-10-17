@@ -190,7 +190,7 @@ def complete_order(update, context):
     time.sleep(1.5)
 
     # Recommend donations amount
-    context.user_data['recommended_dontation'] = menu[context.user_data['selected_order']]['recommended_dontation'] * context.user_data['servings']
+    context.user_data['recommended_dontation'] = db.child("menu").get().val()[context.user_data['selected_order']]['recommended_dontation'] * context.user_data['servings']
 
     context.bot.sendMessage(
         chat_id=context.chat_data['chatid'],
