@@ -10,7 +10,7 @@ from telegram import (KeyboardButton, InlineKeyboardButton,
                       InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, ConversationHandler, CallbackQueryHandler)
-from firebase import (pushData, db)
+from firebase import (pushData, queryMenu, db)
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -21,7 +21,9 @@ logger = logging.getLogger(__name__)
 pp = pprint.PrettyPrinter()
 
 # Initialize converstation handler states
-BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED, LOG_FEEDBACK = range(5)
+BUTTON_MENU, MENU_BUTTON_CLICKED, ICE_BUTTON_CLICKED, SERVINGS_BUTTON_CLICKED, LOG_FEEDBACK = range(
+    5)
+
 
 def start(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
@@ -37,7 +39,8 @@ def start(update, context):
 
 def today_menu(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
-    str_menu = "\n".join([key for (key, value) in db.child("menu").get().val().items() if value['serving']])
+    str_menu = "\n".join(
+        [value['name'] for (key, value) in queryMenu() if value['serving']])
 
     context.bot.sendMessage(
         chat_id=context.chat_data['chatid'],
@@ -70,7 +73,7 @@ def button_menu(update, context):
         context.user_data['input_name'] = update.message.text
 
         button_list = [[InlineKeyboardButton(
-            s, callback_data=s)] for s in [key for (key, value) in db.child("menu").get().val().items() if value['serving']]]
+            s, callback_data=s)] for s in [value['name'] for (key, value) in queryMenu() if value['serving']]]
         reply_markup = InlineKeyboardMarkup(button_list)
 
         update.message.reply_text('Hi {NAME}!\n\nWhat would you like to have for today?\n'.format(NAME=context.user_data['input_name']),
@@ -190,7 +193,8 @@ def complete_order(update, context):
     time.sleep(1.5)
 
     # Recommend donations amount
-    context.user_data['recommended_dontation'] = db.child("menu").get().val()[context.user_data['selected_order']]['recommended_dontation'] * context.user_data['servings']
+    context.user_data['recommended_dontation'] = float([value['recommended_dontation'] for (key, value) in queryMenu() if value['name'] == context.user_data['selected_order']][0]) * context.user_data['servings']
+    
 
     context.bot.sendMessage(
         chat_id=context.chat_data['chatid'],
@@ -221,10 +225,11 @@ def log_order_data(context_data):
         "served": False
     }
 
+    pp.pprint(context_data)
+
     # Firebase
     pushData(order_data, "orders")
 
-    pp.pprint(context_data)
 
     return
 

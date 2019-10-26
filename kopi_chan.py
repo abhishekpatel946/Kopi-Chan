@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-
-from telegram.ext import (Updater, CommandHandler, MessageHandler,
-                          Filters, ConversationHandler, CallbackQueryHandler)
-from kopi_chan_conv import *
-
-
-# Telegram bot token
-TOKEN = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
-
-=======
 import os
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackQueryHandler)
 from conversations import *
@@ -18,7 +7,6 @@ TOKEN = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
 APP_NAME = "kopi-chan"
 # Port is given by Heroku
 PORT = os.environ.get('PORT')
->>>>>>> deployheroku
 
 def main():
     # Create the Updater and pass it your bot's TOKEN.
