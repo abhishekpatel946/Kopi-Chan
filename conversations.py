@@ -214,7 +214,7 @@ def complete_order(update, context):
 def log_order_data(context_data):
 
     order_data = {
-        "datetime": datetime.now(pytz.timezone('Asia/Singapore')).strftime("%d %b %Y %H:%M:%S"),
+        "datetime": datetime.now(pytz.timezone('Asia/Singapore')).strftime("%Y-%m-%d  %H:%M:%S"),
         "name": context_data['input_name'],
         "username": context_data['user'],
         "order": context_data['selected_order'],
@@ -244,7 +244,7 @@ def feedback(update, context):
 
 def log_feedback(update, context):
     date = datetime.now(pytz.timezone('Asia/Singapore')
-                        ).strftime("%d %b %Y %H:%M:%S")
+                        ).strftime("%Y-%m-%d  %H:%M:%S")
     username = update.message.from_user.username
     feedback_text = update.message.text
 
