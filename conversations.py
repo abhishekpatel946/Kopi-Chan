@@ -190,15 +190,19 @@ def complete_order(update, context):
             text='Your order has been successfully submitted!\n\n✳*Please get an empty cup and proceed to one of our lovely baristas!*\n',
             parse_mode=telegram.ParseMode.MARKDOWN)
 
-    time.sleep(1.5)
+    time.sleep(1)
 
     # Recommend donations amount
     context.user_data['recommended_dontation'] = float([value['recommended_dontation'] for (key, value) in queryMenu() if value['name'] == context.user_data['selected_order']][0]) * context.user_data['servings']
     
+    context.bot.sendPhoto(
+        chat_id = context.chat_data['chatid'],
+        photo = open('img/bern.jpg', 'rb')
+    )
 
     context.bot.sendMessage(
         chat_id=context.chat_data['chatid'],
-        text='We accept PayLah donations at http://gg.gg/donateUSCaff\n\n*The recommended donation amount for your order is: ${0:.2f}* \n\nThis recommended donation amount will help us cover our costs!'.format(
+        text='We accept PayLah donations at http://gg.gg/donateUSCaff\n\n*The recommended donation amount for your order is: ${0:.2f}* \n\nThis recommended donation amount will help us cover our costs! To find out more how we calculate our costs, feel free to talk to one of our friendly baristas!'.format(
             context.user_data['recommended_dontation']),
         parse_mode=telegram.ParseMode.MARKDOWN)
 
@@ -229,7 +233,6 @@ def log_order_data(context_data):
 
     # Firebase
     pushData(order_data, "orders")
-
 
     return
 
