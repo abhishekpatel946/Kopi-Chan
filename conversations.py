@@ -10,7 +10,7 @@ from telegram import (KeyboardButton, InlineKeyboardButton,
                       InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, ConversationHandler, CallbackQueryHandler)
-from firebase import (pushData, queryMenu, db)
+from firebase import (PushData, QueryMenu, db)
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -39,8 +39,7 @@ def start(update, context):
 
 def today_menu(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
-    str_menu = "\n".join(
-        [value['name'] for (key, value) in queryMenu() if value['serving']])
+    str_menu = "\n".join(sorted([value['name'] for (key, value) in QueryMenu() if value['serving']]))
 
     context.bot.sendMessage(
         chat_id=context.chat_data['chatid'],
@@ -73,7 +72,7 @@ def button_menu(update, context):
         context.user_data['input_name'] = update.message.text
 
         button_list = [[InlineKeyboardButton(
-            s, callback_data=s)] for s in [value['name'] for (key, value) in queryMenu() if value['serving']]]
+            s, callback_data=s)] for s in [value['name'] for (key, value) in QueryMenu() if value['serving']]]
         reply_markup = InlineKeyboardMarkup(button_list)
 
         update.message.reply_text('Hi {NAME}!\n\nWhat would you like to have for today?\n'.format(NAME=context.user_data['input_name']),
@@ -193,7 +192,7 @@ def complete_order(update, context):
     time.sleep(1)
 
     # Recommend donations amount
-    context.user_data['recommended_dontation'] = float([value['recommended_dontation'] for (key, value) in queryMenu() if value['name'] == context.user_data['selected_order']][0]) * context.user_data['servings']
+    context.user_data['recommended_dontation'] = float([value['recommended_dontation'] for (key, value) in QueryMenu() if value['name'] == context.user_data['selected_order']][0]) * context.user_data['servings']
     
     context.bot.sendPhoto(
         chat_id = context.chat_data['chatid'],
@@ -232,7 +231,7 @@ def log_order_data(context_data):
     pp.pprint(context_data)
 
     # Firebase
-    pushData(order_data, "orders")
+    PushData(order_data, "orders")
 
     return
 
@@ -258,7 +257,7 @@ def log_feedback(update, context):
         "text": feedback_text
     }
 
-    pushData(feedback_data, "feedbacks")
+    PushData(feedback_data, "feedbacks")
 
     update.message.reply_text(
         'Thank you for your feedback! Your input means a lot to us!')

@@ -20,8 +20,8 @@ user = auth.sign_in_with_custom_token(token)
 # Get a reference to the database service
 db = firebase.database()
 
-def pushData(data, dbName):
+def PushData(data, dbName):
     results = db.child(dbName).push(data)
 
-def queryMenu():
+def QueryMenu():
     return db.child("menu").get().val().items()
