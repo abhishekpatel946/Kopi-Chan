@@ -39,7 +39,8 @@ def start(update, context):
 
 def today_menu(update, context):
     context.chat_data['chatid'] = update.effective_chat.id
-    str_menu = "\n".join(sorted([value['name'] for (key, value) in QueryMenu() if value['serving']]))
+    str_menu = "\n".join(
+        sorted([value['name'] for (key, value) in QueryMenu() if value['serving']]))
 
     context.bot.sendMessage(
         chat_id=context.chat_data['chatid'],
@@ -192,11 +193,12 @@ def complete_order(update, context):
     time.sleep(1)
 
     # Recommend donations amount
-    context.user_data['recommended_dontation'] = float([value['recommended_dontation'] for (key, value) in QueryMenu() if value['name'] == context.user_data['selected_order']][0]) * context.user_data['servings']
-    
+    context.user_data['recommended_dontation'] = float([value['recommended_dontation'] for (key, value) in QueryMenu(
+    ) if value['name'] == context.user_data['selected_order']][0]) * context.user_data['servings']
+
     context.bot.sendPhoto(
-        chat_id = context.chat_data['chatid'],
-        photo = open('img/bern.jpg', 'rb')
+        chat_id=context.chat_data['chatid'],
+        photo=open('img/bern.jpg', 'rb')
     )
 
     context.bot.sendMessage(

@@ -1,12 +1,5 @@
 import pyrebase
-
-config = {
-    "apiKey": "AIzaSyB3uWHGYINp6J6P2f-R-vYpM89kQorb_Uo",
-    "authDomain": "uscaffeinatedbot.firebaseapp.com",
-    "databaseURL": "https://uscaffeinatedbot.firebaseio.com/",
-    "storageBucket": "uscaffeinatedbot.appspot.com",
-    "serviceAccount": "./uscaffeinatedbot-firebase-adminsdk-3awke-82b73b167b.json"
-}
+from credentials.firebase_config import config
 
 firebase = pyrebase.initialize_app(config)
 
@@ -20,8 +13,10 @@ user = auth.sign_in_with_custom_token(token)
 # Get a reference to the database service
 db = firebase.database()
 
+
 def PushData(data, dbName):
     results = db.child(dbName).push(data)
+
 
 def QueryMenu():
     return db.child("menu").get().val().items()

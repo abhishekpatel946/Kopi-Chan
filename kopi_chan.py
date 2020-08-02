@@ -1,5 +1,6 @@
 import os
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackQueryHandler)
+from telegram.ext import (Updater, CommandHandler, MessageHandler,
+                          Filters, ConversationHandler, CallbackQueryHandler)
 from conversations import *
 
 # Telegram bot token
@@ -7,6 +8,7 @@ TOKEN = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
 APP_NAME = "kopi-chan"
 # Port is given by Heroku
 PORT = os.environ.get('PORT')
+
 
 def main():
     # Create the Updater and pass it your bot's TOKEN.
@@ -45,20 +47,20 @@ def main():
     # log all errors
     dp.add_error_handler(error)
 
-    # # Start the Bot
-    # updater.start_polling()
+    # Uncomment to start the Bot locally
+    updater.start_polling()
 
-    # Start the webhook
-    updater.start_webhook(listen="0.0.0.0",
-                          port=int(PORT),
-                          url_path=TOKEN)
-                          
-    updater.bot.setWebhook("https://{}.herokuapp.com/{}".format(APP_NAME, TOKEN))
+    # # Uncomment to tart the webhook for hosting bot on Heroku
+    # updater.start_webhook(listen="0.0.0.0",
+    #                       port=int(PORT),
+    #                       url_path=TOKEN)
+    # updater.bot.setWebhook(f"https://{APP_NAME}.herokuapp.com/{TOKEN}")
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
 
 if __name__ == '__main__':
     main()
