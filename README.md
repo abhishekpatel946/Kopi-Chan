@@ -25,8 +25,9 @@ individually to install the required packages.
 Make sure in the root folder, there is a `credentials` folder that contains the Firebase credentials as below:
 
 ```
-kopichan
+Kopi-Chan
 └───credentials
+|   |   telegram_token.py
 │   │   firebase_config.py
 │   │   firebase_service_account_credentials.json
 |...
@@ -75,3 +76,5 @@ Make sure the folliwng lines are commented as they are for local hosting:
 # # Uncomment to start the Bot locally
 # updater.start_polling()
 ```
+
+To deploy to Heroku, simply run `git push heroku master`.
