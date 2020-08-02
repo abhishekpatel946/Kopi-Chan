@@ -2,9 +2,10 @@ import os
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, ConversationHandler, CallbackQueryHandler)
 from conversations import *
+from credentials.telegram_token import TOKEN
 
-# Telegram bot token
-TOKEN = "908143577:AAEjKlF05FauSivmwYeQ1Hv1HHZRlLaNHsw"
+
+# Heroku app name
 APP_NAME = "kopi-chan"
 # Port is given by Heroku
 PORT = os.environ.get('PORT')
