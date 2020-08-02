@@ -48,14 +48,14 @@ def main():
     # log all errors
     dp.add_error_handler(error)
 
-    # Uncomment to start the Bot locally
-    updater.start_polling()
+    # # Uncomment to start the Bot locally
+    # updater.start_polling()
 
-    # # Uncomment to tart the webhook for hosting bot on Heroku
-    # updater.start_webhook(listen="0.0.0.0",
-    #                       port=int(PORT),
-    #                       url_path=TOKEN)
-    # updater.bot.setWebhook(f"https://{APP_NAME}.herokuapp.com/{TOKEN}")
+    # Uncomment to tart the webhook for hosting bot on Heroku
+    updater.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=TOKEN)
+    updater.bot.setWebhook(f"https://{APP_NAME}.herokuapp.com/{TOKEN}")
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
