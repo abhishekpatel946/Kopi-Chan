@@ -58,7 +58,13 @@ Kopi-Chan
 
 ## How to deploy Bot on Heroku
 
-kopi-chan is deployed on Heroku using Heroku CLI.
+kopi-chan is deployed on Heroku using [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli). First log in to Heroku using
+
+```
+heroku login
+```
+
+You only have to do this login step once.
 
 1. In `kopi_chan.py`, make sure the following lines are uncommented:
 
