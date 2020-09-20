@@ -271,7 +271,7 @@ def cancel(update, context):
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     update.message.reply_text('Bye! Hope to see you again soon uwu~',
-                              reply_markup=ReplyKeyboardRemove())\
+                              reply_markup=ReplyKeyboardRemove())
 
     return ConversationHandler.END
 
